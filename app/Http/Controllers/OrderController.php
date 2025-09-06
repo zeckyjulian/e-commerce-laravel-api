@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -31,6 +32,15 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        if (!$user->profile || !$user->profile->phone || !$user->profile->shipping_address) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Complete your profile (Phone & Shipping Address) before checkout.'
+            ], 422);
+        }
+
         $request->validate([
             'payment_method' => 'required|string',
             'shipping_address' => 'required|string',
@@ -45,26 +55,30 @@ class OrderController extends Controller
             ], 400);
         }
 
-        $total = $cart->items->sum(fn($item) => $item->product->price * $item->quantity);
+        $order = DB::transaction(function () use ($request, $cart, $user) {
+            $total = $cart->items->sum(fn($item) => $item->product->price * $item->quantity);
 
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'total' => $total,
-            'status' => 'pending',
-            'payment_method' => $request->payment_method,
-            'shipping_address' => $request->shipping_address,
-        ]);
-
-        foreach ($cart->items as $cartItem) {
-            $order->items()->create([
-                'product_id' => $cartItem->product_id,
-                'size_id' => $cartItem->size_id,
-                'quantity' => $cartItem->quantity,
-                'price' => $cartItem->product->price,
+            $order = Order::create([
+                'user_id' => $user->id,
+                'total' => $total,
+                'status' => 'pending',
+                'payment_method' => $request->payment_method,
+                'shipping_address' => $request->shipping_address,
             ]);
-        }
 
-        $cart->items()->delete();
+            foreach ($cart->items as $cartItem) {
+                $order->items()->create([
+                    'product_id' => $cartItem->product_id,
+                    'size_id' => $cartItem->size_id,
+                    'quantity' => $cartItem->quantity,
+                    'price' => $cartItem->product->price,
+                ]);
+            }
+
+            $cart->items()->delete();
+
+            return $order;
+        });
 
         return response()->json([
             'status' => true,
