@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Size;
 use App\Models\User;
+use App\Models\UserProfile;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,6 +22,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('password'),
+        ]);
+
+        UserProfile::factory()->create([
+            'user_id' => 1,
         ]);
 
         Category::create([

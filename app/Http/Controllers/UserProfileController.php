@@ -28,7 +28,20 @@ class UserProfileController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = Auth::user();
+
+        if ($user->id != $id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized access.',
+            ], 403);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile data successfully showed.',
+            'data' => $user->profile,
+        ]);
     }
 
     /**
