@@ -17,6 +17,7 @@ Route::apiResource('/products', ProductController::class);
 Route::apiResource('/sizes', SizeController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
