@@ -92,7 +92,16 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $order = Order::with('items.product', 'items.size')
+            ->where('id', $id)
+            ->where('iser_id', Auth::id())
+            ->firstOrFail();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Order detail retrieved successfully.',
+            'data' => $order
+        ]);
     }
 
     /**

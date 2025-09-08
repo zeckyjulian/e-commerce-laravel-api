@@ -53,10 +53,16 @@ class UserProfileController extends Controller
             'phone' => 'required|string|max:20',
             'shipping_address' => 'required|string|max:255',
             'gender' => 'required|in:M,F',
-            'date_of_birth' => 'required|date'
+            'date_of_birth' => 'required|date',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user = Auth::user();
+
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('profile_photos', 'public');
+            $data['photo'] = $photoPath;
+        }
 
         $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
