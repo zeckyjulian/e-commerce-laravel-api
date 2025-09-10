@@ -16,6 +16,14 @@ class CartController extends Controller
         $cart = Cart::with('items.product', 'items.size')
                 ->where('user_id', auth()->id())
                 ->first();
+
+        if (!$cart) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Cart is Empty.',
+                'data' => [],
+            ]);
+        }
         
         $data = $cart->items->map(function ($item) {
             return [
@@ -62,14 +70,6 @@ class CartController extends Controller
             'message' => 'Product successfully stored to cart',
             'data' => $cart,
         ], 201);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**

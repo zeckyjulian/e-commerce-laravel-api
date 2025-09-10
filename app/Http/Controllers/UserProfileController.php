@@ -8,22 +8,6 @@ use Illuminate\Support\Facades\Auth;
 class UserProfileController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(string $id)
@@ -61,7 +45,7 @@ class UserProfileController extends Controller
 
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('profile_photos', 'public');
-            $data['photo'] = $photoPath;
+            $data['photo'] = basename($photoPath);
         } else {
             unset($data['photo']);
         }
@@ -76,13 +60,5 @@ class UserProfileController extends Controller
             'message' => 'Profile updated successfully',
             'data' => $profile,
         ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

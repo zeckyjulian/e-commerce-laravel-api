@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('shipping_address')->nullable();
             $table->enum('gender', ['M', 'F'])->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->timestamps();
         });
     }
