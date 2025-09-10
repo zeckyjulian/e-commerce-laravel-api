@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("status")->default("pending");
             $table->string("payment_method");
             $table->text("shipping_address");
+            $table->date('date_of_buy');
             $table->timestamps();
         });
     }

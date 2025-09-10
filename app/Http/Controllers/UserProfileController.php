@@ -50,10 +50,10 @@ class UserProfileController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $request->validate([
-            'phone' => 'required|string|max:20',
-            'shipping_address' => 'required|string|max:255',
-            'gender' => 'required|in:M,F',
-            'date_of_birth' => 'required|date',
+            'phone' => 'nullable|string|max:20',
+            'shipping_address' => 'nullable|string|max:255',
+            'gender' => 'nullable|in:M,F',
+            'date_of_birth' => 'nullable|date',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -62,9 +62,11 @@ class UserProfileController extends Controller
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('profile_photos', 'public');
             $data['photo'] = $photoPath;
+        } else {
+            unset($data['photo']);
         }
 
-        $user->profile()->updateOrCreate(
+        $profile = $user->profile()->updateOrCreate(
             ['user_id' => $user->id],
             $data
         );
@@ -72,7 +74,7 @@ class UserProfileController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Profile updated successfully',
-            'data' => $user->profile,
+            'data' => $profile,
         ]);
     }
 
