@@ -64,6 +64,7 @@ class OrderController extends Controller
                 'status' => 'pending',
                 'payment_method' => $request->payment_method,
                 'shipping_address' => $request->shipping_address,
+                'date_of_buy' => now()->toDateString(),
             ]);
 
             foreach ($cart->items as $cartItem) {
@@ -94,7 +95,7 @@ class OrderController extends Controller
     {
         $order = Order::with('items.product', 'items.size')
             ->where('id', $id)
-            ->where('iser_id', Auth::id())
+            ->where('user_id', Auth::id())
             ->firstOrFail();
 
         return response()->json([
