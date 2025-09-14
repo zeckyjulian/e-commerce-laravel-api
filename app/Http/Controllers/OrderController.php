@@ -28,6 +28,22 @@ class OrderController extends Controller
     }
 
     /**
+     * Display all data.
+     */
+    public function allOrders()
+    {
+        $orders = Order::with('items.product', 'items.size', 'user')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data order retrieved successfully.',
+            'data' => $orders,
+        ]);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
