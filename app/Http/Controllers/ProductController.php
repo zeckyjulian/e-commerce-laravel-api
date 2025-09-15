@@ -13,7 +13,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::paginate(20);
+        $products = Product::with('category')->paginate(20);
         return response()->json([
             'status' => true,
             'message' => 'Products retrieved successfully',
