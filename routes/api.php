@@ -30,7 +30,10 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [AuthController::class, 'index']);
+    Route::post('/users', [AuthController::class, 'store']);
     Route::get('/user/{id}', [AuthController::class, 'show']);
+    Route::put('/user/{id}', [AuthController::class, 'update']);
+    Route::delete('/user/{id}', [AuthController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

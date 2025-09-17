@@ -21,6 +21,29 @@ class AuthController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role' => 'sometimes|in:user,admin',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role' => $validated['role'] ?? 'user',
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User created successfully',
+            'data' => $user,
+        ], 201);
+    }
+
     public function show(string $id)
     {
         $user = User::find($id);
@@ -34,7 +57,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'User retrieved successfully',
+            'message' => 'User retrieved successfully.',
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -42,6 +65,49 @@ class AuthController extends Controller
                 'role' => $user->role,
             ],
         ]);
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+            'role' => 'nullable|in:user,admin',
+        ]);
+
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($validated);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User updated successfully.',
+            'data' => $user
+        ]);
+    }
+
+    public function destroy(string $id)
+    {
+        $user = User::find($id);
+
+        $user->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User deleted successfully.',
+        ], 204);
     }
 
     /**
