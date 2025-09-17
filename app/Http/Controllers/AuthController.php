@@ -9,6 +9,18 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function index()
+    {
+        $user = User::with('profile')
+            ->where('role', 'user')
+            ->get();
+        return response()->json([
+            'status' => true,
+            'message' => 'User retrieved successfully',
+            'data' => $user
+        ]);
+    }
+
     public function show(string $id)
     {
         $user = User::find($id);

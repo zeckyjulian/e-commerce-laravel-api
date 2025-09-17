@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/users', [AuthController::class, 'index']);
     Route::get('/user/{id}', [AuthController::class, 'show']);
 });
 
