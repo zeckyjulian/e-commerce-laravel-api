@@ -11,10 +11,15 @@ class Product extends Model
 
     protected $fillable = [
         'product_name',
+        'color',
         'category_id',
         'price',
         'description',
         'image',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
     ];
 
     public function category()

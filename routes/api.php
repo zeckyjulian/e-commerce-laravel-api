@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::apiResource('/products', ProductController::class);
 Route::apiResource('/sizes', SizeController::class);
+Route::apiResource('/categories', CategoryController::class);
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -26,6 +28,12 @@ Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', fn() => response()->json(['message' => 'Welcome, admin!']));
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/admin/product', [ProductController::class, 'store']);
+    Route::put('/admin/product/{id}', [ProductController::class, 'update']);
+    Route::delete('/admin/product/{id}', [ProductController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
