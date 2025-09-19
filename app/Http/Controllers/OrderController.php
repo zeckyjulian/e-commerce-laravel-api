@@ -126,7 +126,11 @@ class OrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $order = Order::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $request->validate([
+            'status' => 'required|string|in:pending,processing,shipping,delivered',
+        ]);
+
+        $order = Order::findOrFail($id);
         $order->update(['status' => $request->status]);
 
         return response()->json([
