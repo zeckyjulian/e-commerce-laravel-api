@@ -107,7 +107,8 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User deleted successfully.',
-        ], 204);
+            'data' => $user,
+        ], 200);
     }
 
     /**

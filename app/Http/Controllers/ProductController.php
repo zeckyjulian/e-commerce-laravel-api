@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
@@ -74,8 +75,10 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, string $id)
     {
+        $product = Product::find($id);
+
         $validator = Validator::make($request->all(), [
             'product_name' => 'sometimes|required|string|max:255',
             'color' => 'sometimes|required|string|max:100',
@@ -96,7 +99,12 @@ class ProductController extends Controller
         $data = $validator->validated();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            if ($product->image && Storage::disk('public')->exists('products/' . $product->image)) {
+                Storage::disk('public')->delete('products/' . $product->image);
+            }
+
+            $imagePath = $request->file('image')->store('products', 'public');
+            $data['image'] = basename($imagePath);
         }
 
         $product->update($data);
@@ -111,12 +119,19 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy(string $id)
     {
+        $product = Product::findOrFail($id);
+
+        if ($product->image && Storage::disk('public')->exists('products/' . $product->image)) {
+            Storage::disk('public')->delete('products/' . $product->image);
+        }
+
         $product->delete();
         return response()->json([
             'status' => true,
-            'message' => 'Product deleted successfully'
-        ], 204);
+            'message' => 'Product deleted successfully',
+            'data' => $id,
+        ], 200);
     }
 }
