@@ -1,1 +1,4 @@
 *.sqlite*
+/database/seeders/*.php
+/database/factories/*.php
+/database/migrations/*.php
